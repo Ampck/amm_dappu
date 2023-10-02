@@ -1,11 +1,10 @@
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { Container } from 'react-bootstrap'
-import { ethers } from 'ethers'
 
 import Navigation from './Navigation';
 
-import { loadProvider, loadAccount, loadNetwork } from '../store/interactions';
+import { loadProvider, loadAccount, loadNetwork, loadTokens, loadAMM, loadBalances } from '../store/interactions';
 
 function App() {
   const dispatch = useDispatch()
@@ -14,7 +13,14 @@ function App() {
     const provider = loadProvider(dispatch)
     const chainId = await loadNetwork(provider, dispatch)
 
-    await loadAccount(dispatch)
+    let account = await loadAccount(dispatch)
+
+    let tokens = await loadTokens(provider, chainId, dispatch)
+
+    await loadAMM(provider, chainId, dispatch)
+
+    await loadBalances(tokens, account, dispatch)
+
   }
 
   useEffect(() => {
