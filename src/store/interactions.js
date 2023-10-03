@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import { setAccount, setProvider, setNetwork } from './reducers/provider'
 import { setContracts, setSymbols, balancesLoaded } from './reducers/tokens'
-import { setContract } from './reducers/amm'
+import { setContract, sharesLoaded } from './reducers/amm'
 
 import TOKEN_ABI from '../abis/Token.json';
 import AMM_ABI from '../abis/AMM.json';
@@ -48,9 +48,10 @@ export const loadAMM = async (provider, chainId, dispatch) => {
 	return amm
 }
 
-export const loadBalances = async (tokens, account, dispatch) => {
+export const loadBalances = async (amm, tokens, account, dispatch) => {
 	dispatch(balancesLoaded([
-		await tokens[0].balanceOf(account),
-		await tokens[1].balanceOf(account)
+		ethers.utils.formatUnits((await tokens[0].balanceOf(account)).toString(), 'ether'),
+		ethers.utils.formatUnits((await tokens[1].balanceOf(account)).toString(), 'ether')
 	]))
+	dispatch(sharesLoaded(ethers.utils.formatUnits((await amm.shares(account)).toString(), 'ether')))
 }

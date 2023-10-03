@@ -13,13 +13,16 @@ function App() {
     const provider = loadProvider(dispatch)
     const chainId = await loadNetwork(provider, dispatch)
 
-    let account = await loadAccount(dispatch)
+    window.ethereum.on('accountsChanged', async () => {
+      await loadAccount(dispatch)
+    })
 
     let tokens = await loadTokens(provider, chainId, dispatch)
 
     await loadAMM(provider, chainId, dispatch)
 
-    await loadBalances(tokens, account, dispatch)
+    //let account = await loadAccount(dispatch)
+    //await loadBalances(tokens, account, dispatch)
 
   }
 
@@ -29,9 +32,9 @@ function App() {
 
   return(
     <Container>
-      <Navigation account={'0x0...'} />
+      <Navigation/>
 
-      <h1 className='my-4 text-center'>React Hardhat Template</h1>
+      <h1 className='my-4 text-center'>Dapp University AMM</h1>
     </Container>
   )
 }
