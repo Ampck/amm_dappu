@@ -1,7 +1,7 @@
 import { ethers } from 'ethers'
 import { setAccount, setProvider, setNetwork } from './reducers/provider'
 import { setContracts, setSymbols, balancesLoaded } from './reducers/tokens'
-import { setContract, sharesLoaded } from './reducers/amm'
+import { setContract, sharesLoaded, swapRequest } from './reducers/amm'
 
 import TOKEN_ABI from '../abis/Token.json';
 import AMM_ABI from '../abis/AMM.json';
@@ -49,9 +49,34 @@ export const loadAMM = async (provider, chainId, dispatch) => {
 }
 
 export const loadBalances = async (amm, tokens, account, dispatch) => {
-	dispatch(balancesLoaded([
-		ethers.utils.formatUnits((await tokens[0].balanceOf(account)).toString(), 'ether'),
-		ethers.utils.formatUnits((await tokens[1].balanceOf(account)).toString(), 'ether')
-	]))
-	dispatch(sharesLoaded(ethers.utils.formatUnits((await amm.shares(account)).toString(), 'ether')))
+const balance1 = await tokens[0].balanceOf(account)
+  const balance2 = await tokens[1].balanceOf(account)
+
+  dispatch(balancesLoaded([
+    ethers.utils.formatUnits(balance1.toString(), 'ether'),
+    ethers.utils.formatUnits(balance2.toString(), 'ether')
+  ]))
+
+  const shares = await amm.shares(account)
+  dispatch(sharesLoaded(ethers.utils.formatUnits(shares.toString(), 'ether')))
+}
+
+export const swap = async (provider, amm, token, symbol, amount, dispatch) => {
+	dispatch(swapRequest())
+
+	let transaction
+
+	const signer = await provider.getSigner()
+
+	transaction = await token.connect(signer).approve(amm.address, amount)
+	await transaction.wait(0)
+
+	if (symbol === "DAPP") {
+		transaction = await amm.connect(signer).swapToken1(amount)
+	} else {
+		transaction = await amm.connect(signer).swapToken2(amount)
+	}
+
+	await transaction.wait()
+
 }
