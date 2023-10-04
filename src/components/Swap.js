@@ -34,7 +34,7 @@ const Swap = () => {
 	const symbols = useSelector(state => state.tokens.symbols)
 	const balances = useSelector(state => state.tokens.balances)
 
-	const amm = useSelector(state => state.amm.contract) 
+	const amm = useSelector(state => state.amm.contract)
 	const isSwapping = useSelector(state => state.amm.swapping.isSwapping)
 	const isSuccess = useSelector(state => state.amm.swapping.isSuccess)
 	const transactionHash = useSelector(state => state.amm.swapping.transactionHash)
@@ -119,7 +119,7 @@ const Swap = () => {
 
 				{account ? (
 					<Form onSubmit={swapHandler} className='my-3'>
-						<Row>
+						<Row className='my-3'>
 							<div className='d-flex justify-content-between'>
 								<Form.Label><strong>Input: </strong></Form.Label>
 								<Form.Text muted>
@@ -152,7 +152,7 @@ const Swap = () => {
 						</Row>
 						<Row>
 							<div className='d-flex justify-content-between'>
-								<Form.Label><strong>Input: </strong></Form.Label>
+								<Form.Label><strong>Output: </strong></Form.Label>
 								<Form.Text muted>
 									Balance: {
 										outputToken === symbols[0] ? (
