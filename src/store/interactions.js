@@ -9,7 +9,10 @@ import {
 	swapFail,
 	depositRequest,
 	depositSuccess,
-	depositFail
+	depositFail,
+	withdrawRequest,
+	withdrawSuccess,
+	withdrawFail
 } from './reducers/amm'
 
 import TOKEN_ABI from '../abis/Token.json';
@@ -68,6 +71,25 @@ const balance1 = await tokens[0].balanceOf(account)
 
   const shares = await amm.shares(account)
   dispatch(sharesLoaded(ethers.utils.formatUnits(shares.toString(), 'ether')))
+}
+
+export const removeLiquidity = async (provider, amm, shares, dispatch) => {
+
+	try {
+		dispatch(withdrawRequest())
+
+		let transaction
+		const signer = await provider.getSigner()
+
+		transaction = await amm.connect(signer).removeLiquidity(shares)
+		await transaction.wait()
+
+		dispatch(withdrawSuccess())
+
+	} catch (e) {
+		dispatch(withdrawFail())
+	}
+
 }
 
 export const addLiquidity = async (provider, amm, tokens, amounts, dispatch) => {
